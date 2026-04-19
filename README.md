@@ -12,36 +12,8 @@ collects vital signs + symptoms, and predicts possible diseases using ML/DL mode
 
 ## 🗂️ Folder Structure
 
-```
-health_monitor/
-├── data/
-│   ├── generate_dataset.py     # Synthetic dataset generator (3000 records, 10 diseases)
-│   └── health_data.csv         # Generated dataset
-├── models/
-│   ├── train.py                # Full training pipeline (SK + TensorFlow NN)
-│   ├── random_forest.pkl
-│   ├── logistic_regression.pkl
-│   ├── naive_bayes.pkl
-│   ├── gradient_boosting.pkl
-│   ├── neural_network.keras
-│   ├── preprocessor.pkl
-│   ├── metadata.json
-│   └── plots/
-│       ├── model_comparison.png
-│       ├── confusion_matrix.png
-│       ├── feature_importance.png
-│       └── nn_training_history.png
-├── backend/
-│   └── app.py                  # Flask REST API
-├── frontend/
-│   └── index.html              # Full UI (no framework needed)
-├── utils/
-│   ├── preprocessor.py         # Data cleaning, encoding, risk scoring
-│   └── iot_simulator.py        # Simulated wearable IoT sensors
-└── README.md
-```
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Install dependencies
 ```bash
@@ -69,7 +41,7 @@ Open `frontend/index.html` in your browser.
 
 ---
 
-## 🧠 ML Models & Performance
+##  ML Models & Performance
 
 | Model               | Accuracy | CV Accuracy |
 |---------------------|----------|-------------|
@@ -82,7 +54,7 @@ Open `frontend/index.html` in your browser.
 > Accuracy is high because dataset is synthetic and controlled.
 > Real-world medical data will show lower, more realistic performance.
 
-## 📡 IoT Sensor Simulation
+##  IoT Sensor Simulation
 
 The `IoTHealthSensor` class in `utils/iot_simulator.py` simulates:
 - **Heart Rate** (bpm)
