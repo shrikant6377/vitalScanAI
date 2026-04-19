@@ -1,0 +1,40 @@
+{
+  "classes": [
+    "Anemia",
+    "Asthma",
+    "COVID-19",
+    "Common Cold",
+    "Diabetes Type 2",
+    "Gastroenteritis",
+    "Hypertension",
+    "Influenza",
+    "Migraine",
+    "Pneumonia"
+  ],
+  "sklearn_results": {
+    "Random Forest": {
+      "accuracy": 99.67,
+      "cv_mean": 99.58,
+      "cv_std": 0.29
+    },
+    "Logistic Regression": {
+      "accuracy": 99.5,
+      "cv_mean": 99.63,
+      "cv_std": 0.24
+    },
+    "Naive Bayes": {
+      "accuracy": 99.0,
+      "cv_mean": 99.0,
+      "cv_std": 0.52
+    },
+    "Gradient Boosting": {
+      "accuracy": 99.5,
+      "cv_mean": 99.42,
+      "cv_std": 0.4
+    }
+  },
+  "neural_network": {
+    "accuracy": 99.33,
+    "epochs": 26
+  }
+}

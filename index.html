@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VitalScan AI – Smart Health Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #0f1525;
+  --bg-glass: rgba(15,21,37,0.85);
+  --surface: #141d33;
+  --surface-2: #1a2440;
+  --border: rgba(99,178,255,0.12);
+  --border-glow: rgba(99,178,255,0.35);
+  --accent: #3b8bff;
+  --accent-2: #00d4aa;
+  --accent-3: #ff6b6b;
+  --accent-amber: #ffab00;
+  --text-primary: #e8edf8;
+  --text-secondary: #8fa3c8;
+  --text-muted: #4a5e80;
+  --risk-low: #00d4aa;
+  --risk-med: #ffab00;
+  --risk-high: #ff4757;
+  --r: 14px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(59,139,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(0,212,170,0.06) 0%, transparent 60%);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,14,26,0.92);
+  backdrop-filter: blur(16px);
+}
+.logo {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.logo-text span { color: var(--accent); }
+.header-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,107,107,0.4);
+  color: var(--accent-3);
+  background: rgba(255,71,87,0.08);
+}
+.header-cam-btn {
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(0,212,170,0.4);
+  color: var(--accent-2);
+  background: rgba(0,212,170,0.08);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.header-cam-btn:hover {
+  background: rgba(0,212,170,0.2);
+}
+.iot-dot {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-secondary);
+}
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--accent-2);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ── Layout ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.grid-main {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 900px) { .grid-main { grid-template-columns: 1fr; } }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.card-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.card-icon.blue { background: rgba(59,139,255,0.15); }
+.card-icon.teal { background: rgba(0,212,170,0.15); }
+.card-icon.amber { background: rgba(255,171,0,0.15); }
+.card-icon.red { background: rgba(255,71,87,0.15); }
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.card-subtitle { font-size: 12px; color: var(--text-muted); }
+.card-body { padding: 1.5rem; }
+
+/* ── Form ── */
+.form-group { margin-bottom: 1.25rem; }
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+.form-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 0.65rem 1rem;
+  transition: border-color 0.2s;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,139,255,0.12);
+}
+.vital-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.vital-input-wrap { position: relative; }
+.vital-input-wrap .unit {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px; color: var(--text-muted);
+  pointer-events: none;
+}
+.vital-input-wrap input { padding-right: 2.5rem; }
+
+/* ── Symptom pills ── */
+.symptoms-grid {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.sym-pill {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.18s;
+  background: var(--surface);
+  color: var(--text-secondary);
+  user-select: none;
+  white-space: nowrap;
+}
+.sym-pill:hover { border-color: var(--accent); color: var(--text-primary); }
+.sym-pill.active {
+  background: rgba(59,139,255,0.18);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── IoT Panel ── */
+.iot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.iot-metric {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+.iot-metric-val {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.iot-metric-val.ok { color: var(--accent-2); }
+.iot-metric-val.warn { color: var(--accent-amber); }
+.iot-metric-val.danger { color: var(--accent-3); }
+.iot-metric-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── Waveform ── */
+.waveform-wrap {
+  margin-top: 0.75rem;
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+.waveform-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+canvas#waveform { width: 100%; height: 48px; display: block; }
+
+/* ── Buttons ── */
+.btn {
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #2070ee);
+  color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(59,139,255,0.35); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  font-size: 13px; font-weight: 400;
+  padding: 0.6rem;
+}
+.btn-outline:hover { border-color: var(--border-glow); color: var(--text-primary); }
+
+/* ── Result Panel ── */
+.result-panel { display: none; flex-direction: column; gap: 1rem; }
+.result-panel.visible { display: flex; }
+
+.result-hero {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.result-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,139,255,0.08), transparent);
+}
+.disease-badge {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  background: rgba(59,139,255,0.15);
+  border: 1px solid rgba(59,139,255,0.3);
+  color: var(--accent);
+}
+.disease-name {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+.risk-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px; font-weight: 600;
+  margin-top: 0.5rem;
+}
+.risk-badge.Low { background: rgba(0,212,170,0.15); color: var(--risk-low); border: 1px solid rgba(0,212,170,0.3); }
+.risk-badge.Medium { background: rgba(255,171,0,0.15); color: var(--risk-amber); border: 1px solid rgba(255,171,0,0.3); }
+.risk-badge.High { background: rgba(255,71,87,0.15); color: var(--risk-high); border: 1px solid rgba(255,71,87,0.3); }
+
+.risk-score-bar {
+  margin: 1rem 0 0;
+  position: relative;
+}
+.risk-track {
+  height: 6px; border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.risk-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Probability bars ── */
+.prob-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.prob-row { display: flex; align-items: center; gap: 0.75rem; }
+.prob-name { width: 150px; font-size: 13px; color: var(--text-secondary); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prob-bar-wrap { flex: 1; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.prob-bar { height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.8s ease; }
+.prob-val { width: 42px; text-align: right; font-size: 12px; color: var(--text-muted); }
+
+/* ── Models grid ── */
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+.model-chip {
+  background: var(--surface);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+}
+.model-chip-name { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.model-chip-val { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+
+/* ── Recs ── */
+.rec-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.rec-item {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  font-size: 14px; color: var(--text-secondary);
+  padding: 0.65rem 0.85rem;
+  background: var(--surface);
+  border-radius: 10px;
+}
+.rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-2); margin-top: 5px; flex-shrink: 0; }
+
+/* ── Disclaimer ── */
+.disclaimer {
+  background: rgba(255,171,0,0.06);
+  border: 1px solid rgba(255,171,0,0.2);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-size: 12px;
+  color: #cc8800;
+  display: flex; gap: 0.5rem; align-items: flex-start;
+}
+
+/* ── File Upload ── */
+.upload-zone {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.upload-zone:hover { border-color: var(--border-glow); color: var(--text-secondary); }
+.upload-zone input { display: none; }
+
+/* ── Loading Spinner ── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Camera Modal ── */
+.cam-modal {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(10,14,26,0.95);
+  backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.cam-modal.active { opacity: 1; pointer-events: auto; }
+.cam-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  width: 90%; max-width: 400px;
+  text-align: center;
+}
+.cam-video-wrap {
+  width: 100%; height: 240px;
+  background: #000; border-radius: 10px;
+  overflow: hidden; position: relative;
+  margin: 1rem 0;
+}
+#pulseVideo { width: 100%; height: 100%; object-fit: cover; }
+.cam-overlay {
+  position: absolute; inset: 0;
+  border: 2px solid var(--accent-2);
+  border-radius: 10px; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.cam-overlay::after {
+  content: ''; width: 60px; height: 60px;
+  border: 2px dashed rgba(255,255,255,0.5);
+  border-radius: 50%;
+}
+.pulse-bpm {
+  font-family: var(--font-display);
+  font-size: 3rem; font-weight: 700; color: var(--accent-2);
+}
+
+/* ── Chart canvas ── */
+#chartCanvas { width: 100% !important; }
+
+.section-divider {
+  height: 1px; background: var(--border);
+  margin: 0.75rem 0;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">🫀</div>
+    <div>
+      <div class="logo-text">Vital<span>Scan</span> AI</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:1.25rem;">
+    <button class="header-cam-btn" onclick="openCameraScan()">
+      📷 Check Pulse via Camera
+    </button>
+    <div class="iot-dot"><div class="pulse-dot"></div> IoT Sensor Live</div>
+    <div class="header-badge">⚠ Not a medical tool</div>
+  </div>
+</header>
+
+<!-- Camera Scanner Modal -->
+<div class="cam-modal" id="camModal">
+  <div class="cam-box">
+    <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:600;">Live Camera Pulse Check</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-top:4px;">Place your fingertip perfectly over the camera lens. Wait for the signal to stabilize.</div>
+    
+    <div class="cam-video-wrap">
+      <video id="pulseVideo" autoplay playsinline></video>
+      <canvas id="pulseCanvasH" style="display:none;"></canvas>
+      <div class="cam-overlay"></div>
+    </div>
+    
+    <div class="pulse-bpm" id="liveBpmDisplay">--</div>
+    <div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;">Detected BPM</div>
+    
+    <div style="height:40px;width:100%;background:rgba(0,0,0,0.3);border-radius:5px;position:relative;overflow:hidden;margin-bottom:1rem;">
+      <canvas id="redChannelGraph" style="width:100%;height:100%;display:block;"></canvas>
+    </div>
+
+    <div style="display:flex;gap:0.5rem;justify-content:center;">
+      <button class="btn btn-outline" style="width:auto;padding:0.5rem 1rem;" onclick="closeCameraScan()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:0.5rem 1rem;" onclick="useDetectedPulse()">Use this BPM</button>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+  <!-- IoT Strip -->
+  <div class="card" style="margin-bottom:1.25rem;">
+    <div class="card-header">
+      <div class="card-icon teal">📡</div>
+      <div>
+        <div class="card-title">IoT Body Scanner — Live Readings</div>
+        <div class="card-subtitle">Simulated wearable biosensor data · Updates every 3 s</div>
+      </div>
+      <select id="sensorMode" class="form-input" style="width:auto;margin-left:auto;padding:4px 10px;font-size:12px;">
+        <option value="healthy">Healthy</option>
+        <option value="fever">Fever</option>
+        <option value="cardiac">Cardiac Stress</option>
+        <option value="hypotension">Hypotension</option>
+        <option value="random">Random</option>
+      </select>
+    </div>
+    <div class="card-body" style="padding:1rem 1.5rem;">
+      <div class="iot-grid">
+        <div class="iot-metric">
+          <div class="iot-metric-val ok" id="iot-hr">--</div>
+          <div class="iot-metric-label">Heart Rate (bpm)</div>
+        </div>
+        <div class="iot-metric">
+          <div class="iot-metric-val ok" id="iot-temp">--</div>
+          <div class="iot-metric-label">Temperature (°C)</div>
+        </div>
+        <div class="iot-metric">
+          <div class="iot-metric-val ok" id="iot-spo2">--</div>
+          <div class="iot-metric-label">SpO₂ (%)</div>
+        </div>
+        <div class="iot-metric">
+          <div class="iot-metric-val ok" id="iot-bp">--</div>
+          <div class="iot-metric-label">Blood Pressure</div>
+        </div>
+        <div class="iot-metric">
+          <div class="iot-metric-val" id="iot-quality">--</div>
+          <div class="iot-metric-label">Signal Quality</div>
+        </div>
+        <div class="iot-metric">
+          <div class="iot-metric-val" id="iot-status" style="font-size:0.85rem;">Scanning…</div>
+          <div class="iot-metric-label">Status</div>
+        </div>
+      </div>
+      <div class="waveform-wrap">
+        <div class="waveform-label">ECG Waveform</div>
+        <canvas id="waveform" height="48"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-main">
+
+    <!-- ── LEFT: Input Form ── -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">🩺</div>
+          <div>
+            <div class="card-title">Patient Intake</div>
+            <div class="card-subtitle">Select symptoms and enter vital readings</div>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <div class="form-group">
+            <label class="form-label">Symptoms (select all that apply)</label>
+            <div class="symptoms-grid" id="symptomsGrid"></div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="form-group">
+            <label class="form-label">Vital Signs</label>
+            <div class="vital-row">
+              <div class="vital-input-wrap">
+                <input type="number" id="heartRate" class="form-input" placeholder="Heart Rate" min="30" max="220" value="75">
+                <span class="unit">bpm</span>
+              </div>
+              <div class="vital-input-wrap">
+                <input type="number" id="bodyTemp" class="form-input" placeholder="Temperature" min="34" max="43" step="0.1" value="37.0">
+                <span class="unit">°C</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary btn-outline" onclick="autoFillFromIoT()" style="margin-bottom:0.75rem;width:100%;">
+            ↓ Auto-fill from IoT Sensor
+          </button>
+
+          <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeHealth()">
+            <span id="btnText">Run AI Diagnosis</span>
+            <div class="spinner" id="btnSpinner"></div>
+          </button>
+
+          <div class="section-divider" style="margin-top:1rem;"></div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Upload Historical CSV (Optional)</label>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('csvFile').click()">
+              <input type="file" id="csvFile" accept=".csv" onchange="uploadCSV(this)">
+              <div>📄 Drop CSV or click to browse</div>
+              <div style="font-size:11px;margin-top:4px;">Columns: heart_rate, body_temperature</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Model Performance -->
+      <div class="card" id="modelInfoCard">
+        <div class="card-header">
+          <div class="card-icon amber">📊</div>
+          <div><div class="card-title">Trained Models</div></div>
+        </div>
+        <div class="card-body" id="modelInfoBody">
+          <div style="color:var(--text-muted);font-size:13px;">Loading model info…</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT: Results ── -->
+    <div>
+      <!-- Placeholder -->
+      <div id="placeholderPanel" class="card" style="padding:3rem;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:1rem;">🔬</div>
+        <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;margin-bottom:0.5rem;">Ready for Analysis</div>
+        <div style="color:var(--text-muted);font-size:14px;">Select symptoms and vitals, then click<br><em>Run AI Diagnosis</em> to get your results.</div>
+      </div>
+
+      <!-- Results -->
+      <div class="result-panel" id="resultPanel">
+
+        <!-- Hero -->
+        <div class="result-hero" id="resultHero">
+          <div class="disease-badge">AI PREDICTION</div>
+          <div class="disease-name" id="resultDisease">–</div>
+          <div id="resultRiskBadge" class="risk-badge Low">– Low Risk</div>
+          <div class="risk-score-bar">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+              <span>Risk Score</span>
+              <span id="riskScoreVal">0%</span>
+            </div>
+            <div class="risk-track"><div class="risk-fill" id="riskFill" style="width:0;background:var(--risk-low);"></div></div>
+          </div>
+        </div>
+
+        <!-- Probabilities -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">📈</div>
+            <div><div class="card-title">Disease Probability Breakdown</div></div>
+          </div>
+          <div class="card-body">
+            <div class="prob-list" id="probList"></div>
+          </div>
+        </div>
+
+        <!-- Model Agreement -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon teal">🤝</div>
+            <div>
+              <div class="card-title">Model Agreement</div>
+              <div class="card-subtitle">Predictions from each trained model</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="models-grid" id="modelAgreement"></div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon teal">💊</div>
+            <div><div class="card-title">Recommendations</div></div>
+          </div>
+          <div class="card-body">
+            <ul class="rec-list" id="recList"></ul>
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+          <span>⚠</span>
+          <span id="disclaimerText">This is NOT a medical diagnosis. Always consult a qualified healthcare professional before making any health decisions.</span>
+        </div>
+
+        <!-- CSV Trend Chart -->
+        <div class="card" id="csvChartCard" style="display:none;">
+          <div class="card-header">
+            <div class="card-icon amber">📉</div>
+            <div><div class="card-title">Historical Health Trends</div></div>
+          </div>
+          <div class="card-body">
+            <canvas id="chartCanvas" height="220"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+// ── Camera Pulse detection (rPPG via finger) ─────────────────────────────────
+let camStream = null;
+let pulseTimer = null;
+let redArr = [];
+let bpmEstimates = [];
+
+async function openCameraScan() {
+  document.getElementById("camModal").classList.add("active");
+  redArr = []; bpmEstimates = [];
+  document.getElementById("liveBpmDisplay").textContent = "--";
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+    camStream = stream;
+    const vid = document.getElementById("pulseVideo");
+    vid.srcObject = stream;
+    vid.play();
+    pulseTimer = setInterval(processVideoFrame, 1000 / 30); // ~30 FPS
+  } catch (err) {
+    alert("Camera access denied or unavailable.");
+    closeCameraScan();
+  }
+}
+
+function closeCameraScan() {
+  if (pulseTimer) clearInterval(pulseTimer);
+  if (camStream) camStream.getTracks().forEach(t => t.stop());
+  document.getElementById("camModal").classList.remove("active");
+}
+
+function useDetectedPulse() {
+  const bpm = parseInt(document.getElementById("liveBpmDisplay").textContent);
+  if (!isNaN(bpm)) {
+    document.getElementById("heartRate").value = bpm;
+  }
+  closeCameraScan();
+}
+
+function processVideoFrame() {
+  const vid = document.getElementById("pulseVideo");
+  const cvs = document.getElementById("pulseCanvasH");
+  if (vid.videoWidth === 0) return;
+  
+  cvs.width = vid.videoWidth;
+  cvs.height = vid.videoHeight;
+  const ctx = cvs.getContext("2d");
+  ctx.drawImage(vid, 0, 0, cvs.width, cvs.height);
+  
+  // Get middle region pixels
+  const w = 40, h = 40;
+  const cx = cvs.width/2 - w/2, cy = cvs.height/2 - h/2;
+  const frame = ctx.getImageData(cx, cy, w, h);
+  const data = frame.data;
+  
+  let totalRed = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    totalRed += data[i]; // R
+  }
+  const avgR = totalRed / (data.length / 4);
+  redArr.push(avgR);
+  
+  if (redArr.length > 150) redArr.shift(); // Keep 5 seconds (at 30fps)
+  
+  drawRedGraph();
+  estimateBpm();
+}
+
+function drawRedGraph() {
+  const cvs = document.getElementById("redChannelGraph");
+  cvs.width = cvs.parentElement.clientWidth;
+  cvs.height = cvs.parentElement.clientHeight;
+  const ctx = cvs.getContext("2d");
+  
+  if (redArr.length < 2) return;
+  
+  // Normalize
+  let min = Math.min(...redArr), max = Math.max(...redArr);
+  const range = (max - min) || 1;
+  const step = cvs.width / 150;
+  
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  ctx.beginPath();
+  ctx.strokeStyle = "#ff4757";
+  ctx.lineWidth = 2;
+  for (let i = 0; i < redArr.length; i++) {
+    const val = (redArr[i] - min) / range;
+    const x = i * step;
+    const y = cvs.height - (val * cvs.height);
+    if(i===0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+function estimateBpm() {
+  if (redArr.length < 60) return; // need 2 seconds data
+  
+  // Find peaks (very basic algorithm)
+  let peaks = [];
+  let min = Math.min(...redArr), max = Math.max(...redArr);
+  let threshold = min + (max - min) * 0.75; 
+  
+  for (let i = 2; i < redArr.length - 2; i++) {
+    if (redArr[i] > threshold && 
+        redArr[i] > redArr[i-1] && redArr[i] > redArr[i-2] &&
+        redArr[i] > redArr[i+1] && redArr[i] > redArr[i+2]) {
+      peaks.push(i);
+    }
+  }
+  
+  if (peaks.length >= 2) {
+    let intervals = [];
+    for(let i=1; i<peaks.length; i++){
+      intervals.push(peaks[i] - peaks[i-1]);
+    }
+    
+    // Average frames between peaks
+    let avgInt = intervals.reduce((a,b)=>a+b, 0) / intervals.length;
+    // FPS assumed to be 30 approx
+    let bpm = (30 / avgInt) * 60;
+    
+    if (bpm > 40 && bpm < 200) {
+      bpmEstimates.push(bpm);
+      if (bpmEstimates.length > 5) bpmEstimates.shift();
+      
+      let finalBpm = bpmEstimates.reduce((a,b)=>a+b,0) / bpmEstimates.length;
+      document.getElementById("liveBpmDisplay").textContent = Math.round(finalBpm);
+    }
+  }
+}
+
+// ── Symptoms list & UI ───────────────────────────────────────────────────────
+const ALL_SYMPTOMS = [
+  "abdominal_pain","blurred_vision","body_aches","chest_pain",
+  "chest_tightness","chills","cold_hands","cough","diarrhea",
+  "dizziness","excessive_thirst","fatigue","frequent_urination",
+  "headache","high_fever","loss_of_taste","mild_fever","nausea",
+  "nosebleed","numbness","pale_skin","runny_nose",
+  "sensitivity_to_light","severe_headache","shortness_of_breath",
+  "slow_healing","sneezing","sore_throat","vomiting","wheezing"
+];
+
+const API_BASE = "http://localhost:5001/api";
+
+// ── State ────────────────────────────────────────────────────────────────────
+let selectedSymptoms = new Set();
+let latestIoT = { heart_rate: 75, body_temperature: 37.0 };
+let trendChart = null;
+
+// ── Build symptom pills ──────────────────────────────────────────────────────
+async function loadSymptoms() {
+  try {
+    const resp = await fetch(`${API_BASE}/symptoms`);
+    if (resp.ok) {
+      const data = await resp.json();
+      buildSymptomGrid(data.symptoms);
+      return;
+    }
+  } catch (err) {
+    console.warn("Could not load symptoms from API, using default list.");
+  }
+  buildSymptomGrid(ALL_SYMPTOMS);
+}
+
+function buildSymptomGrid(symptomsList) {
+  const grid = document.getElementById("symptomsGrid");
+  grid.innerHTML = "";
+  symptomsList.forEach(sym => {
+    const pill = document.createElement("div");
+    pill.className = "sym-pill";
+    pill.textContent = sym.replace(/_/g," ");
+    pill.dataset.sym = sym;
+    pill.onclick = () => toggleSymptom(pill, sym);
+    grid.appendChild(pill);
+  });
+}
+
+function toggleSymptom(el, sym) {
+  if (selectedSymptoms.has(sym)) {
+    selectedSymptoms.delete(sym);
+    el.classList.remove("active");
+  } else {
+    selectedSymptoms.add(sym);
+    el.classList.add("active");
+  }
+}
+
+let waveData = new Array(180).fill(0);
+let wavePhase = 0;
+let waveCtx = null;
+
+function initWaveform() {
+  const canvas = document.getElementById("waveform");
+  canvas.width = canvas.parentElement.clientWidth - 24;
+  waveCtx = canvas.getContext("2d");
+}
+
+function ecgSample(t, hr) {
+  const bps = hr / 60;
+  const phase = (t * bps) % 1;
+  if (phase < 0.05) return 0;
+  if (phase < 0.07) return -0.2 + Math.random() * 0.05;
+  if (phase < 0.10) return 0.05;
+  if (phase < 0.12) return 1.8;
+  if (phase < 0.14) return -0.8;
+  if (phase < 0.18) return 0.5;
+  if (phase < 0.22) return 0.15;
+  if (phase < 0.40) return 0.15 * Math.sin((phase - 0.22) * Math.PI / 0.18);
+  return 0 + (Math.random() - 0.5) * 0.04;
+}
+
+function updateWaveform(hr) {
+  wavePhase += 0.08;
+  waveData.push(ecgSample(wavePhase, hr));
+  waveData.shift();
+
+  const canvas = document.getElementById("waveform");
+  const ctx = waveCtx;
+  if (!ctx) return;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.strokeStyle = "#00d4aa";
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = "rgba(0,212,170,0.5)";
+  ctx.shadowBlur = 4;
+  ctx.beginPath();
+  const step = W / (waveData.length - 1);
+  waveData.forEach((v, i) => {
+    const x = i * step;
+    const y = H / 2 - v * (H / 2 - 4);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+function colorClass(val, lo, hi, elId) {
+  const el = document.getElementById(elId);
+  el.classList.remove("ok", "warn", "danger");
+  if (val < lo * 0.9 || val > hi * 1.1) el.classList.add("danger");
+  else if (val < lo || val > hi)         el.classList.add("warn");
+  else                                   el.classList.add("ok");
+}
+
+let iotTick = 0;
+async function updateIoT() {
+  const mode = document.getElementById("sensorMode").value;
+  let hr = 75, temp = 37.0, spo2 = 98.0, sbp = 120, dbp = 80, qual = 1.0;
+
+  try {
+    const resp = await fetch(`${API_BASE}/iot-reading?mode=${mode}`);
+    if (resp.ok) {
+      const data = await resp.json();
+      hr = data.heart_rate;
+      temp = data.body_temperature;
+      spo2 = data.spo2;
+      sbp = data.systolic_bp;
+      dbp = data.diastolic_bp;
+      qual = data.quality_score;
+    }
+  } catch (err) {
+    console.warn("Backend IoT sensor unavailabe, using default values.");
+  }
+
+  latestIoT = { heart_rate: hr, body_temperature: temp };
+
+  document.getElementById("iot-hr").textContent   = hr.toFixed(0);
+  document.getElementById("iot-temp").textContent  = temp.toFixed(1);
+  document.getElementById("iot-spo2").textContent  = spo2.toFixed(1);
+  document.getElementById("iot-bp").textContent    = `${sbp.toFixed(0)}/${dbp.toFixed(0)}`;
+  document.getElementById("iot-quality").textContent = `${(qual*100).toFixed(0)}%`;
+  document.getElementById("iot-status").textContent = qual > 0.9 ? "Optimal" : "Checking";
+
+  colorClass(hr,   60, 100, "iot-hr");
+  colorClass(temp, 36.1, 37.2, "iot-temp");
+  colorClass(spo2, 95, 100, "iot-spo2");
+
+  updateWaveform(hr);
+}
+
+function autoFillFromIoT() {
+  document.getElementById("heartRate").value = latestIoT.heart_rate;
+  document.getElementById("bodyTemp").value  = latestIoT.body_temperature;
+}
+
+// ── Model Info ───────────────────────────────────────────────────────────────
+async function loadModelInfo() {
+  try {
+    const resp = await fetch(`${API_BASE}/models/info`);
+    if (!resp.ok) throw new Error();
+    const data = await resp.json();
+    const body = document.getElementById("modelInfoBody");
+    let html = '<div class="models-grid">';
+    for (const [name, info] of Object.entries(data.results || {})) {
+      html += `<div class="model-chip">
+        <div class="model-chip-name">${name.split(" ")[0]}</div>
+        <div class="model-chip-val">${info.cv_mean}%</div>
+        <div style="font-size:10px;color:var(--text-muted);">CV Acc</div>
+      </div>`;
+    }
+    if (data.neural_network && data.nn_result) {
+      html += `<div class="model-chip">
+        <div class="model-chip-name">Neural Net</div>
+        <div class="model-chip-val">${data.nn_result.accuracy}%</div>
+        <div style="font-size:10px;color:var(--text-muted);">Test Acc</div>
+      </div>`;
+    }
+    html += '</div>';
+    body.innerHTML = html;
+  } catch {
+    document.getElementById("modelInfoBody").innerHTML =
+      '<div style="color:var(--text-muted);font-size:13px;">Start Flask server to see live model stats.</div>';
+  }
+}
+
+// ── Predict ──────────────────────────────────────────────────────────────────
+async function analyzeHealth() {
+  const btn = document.getElementById("analyzeBtn");
+  const spinner = document.getElementById("btnSpinner");
+  const btnText = document.getElementById("btnText");
+
+  btnText.textContent = "Analyzing…";
+  spinner.style.display = "block";
+  btn.disabled = true;
+
+  const symptoms = [...selectedSymptoms];
+  const heartRate = parseFloat(document.getElementById("heartRate").value) || 75;
+  const bodyTemp  = parseFloat(document.getElementById("bodyTemp").value)  || 37.0;
+
+  try {
+    const resp = await fetch(`${API_BASE}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ symptoms, heart_rate: heartRate, body_temperature: bodyTemp }),
+    });
+
+    if (!resp.ok) throw new Error(await resp.text());
+    const data = await resp.json();
+    renderResults(data);
+  } catch (err) {
+    // Demo mode: client-side heuristic result
+    renderDemoResult(symptoms, heartRate, bodyTemp);
+  } finally {
+    btnText.textContent = "Run AI Diagnosis";
+    spinner.style.display = "none";
+    btn.disabled = false;
+  }
+}
+
+// Client-side demo when server is not running
+function renderDemoResult(symptoms, hr, temp) {
+  const hasFever = symptoms.includes("high_fever") || temp > 38;
+  const hasCough = symptoms.includes("cough");
+  const hasSOB   = symptoms.includes("shortness_of_breath");
+  const hasFatigue = symptoms.includes("fatigue");
+
+  let disease = "Common Cold";
+  let recs = ["Rest and stay hydrated","Use saline nasal spray","OTC decongestants may help"];
+
+  if (hasFever && hasCough && hasSOB) { disease = "COVID-19"; recs = ["Isolate immediately","Monitor SpO₂ closely","Seek medical care if breathing worsens"]; }
+  else if (hasFever && hasCough && hasFatigue) { disease = "Influenza"; recs = ["Rest at home","Antiviral within 48 h","Drink plenty of fluids"]; }
+  else if (hr > 100 && temp < 37.5) { disease = "Hypertension"; recs = ["Reduce sodium intake","Exercise regularly","Monitor blood pressure daily"]; }
+
+  const symCount = symptoms.length;
+  const tempDev = Math.max(0, (temp - 37.2) / 37.2);
+  const hrDev   = Math.max(0, (hr - 100) / 100);
+  const riskScore = Math.min(1, symCount / 8 * 0.5 + tempDev * 0.25 + hrDev * 0.25);
+  const risk = riskScore < 0.3 ? "Low" : riskScore < 0.6 ? "Medium" : "High";
+
+  const fakeData = {
+    predicted_disease: disease,
+    risk_level: risk,
+    risk_score: riskScore,
+    top_5_probabilities: [
+      { disease, probability: 72 },
+      { disease: "Influenza", probability: 14 },
+      { disease: "Pneumonia", probability: 7 },
+      { disease: "COVID-19", probability: 5 },
+      { disease: "Common Cold", probability: 2 },
+    ],
+    individual_models: {
+      "Random Forest": disease,
+      "Logistic Regression": disease,
+      "Naive Bayes": disease,
+      "Neural Network": disease,
+    },
+    recommendations: recs,
+    disclaimer: "⚠ DEMO MODE – Server offline. This is NOT a medical diagnosis.",
+  };
+  renderResults(fakeData);
+}
+
+function renderResults(data) {
+  document.getElementById("placeholderPanel").style.display = "none";
+  const panel = document.getElementById("resultPanel");
+  panel.classList.add("visible");
+
+  // Hero
+  document.getElementById("resultDisease").textContent = data.predicted_disease;
+  const rb = document.getElementById("resultRiskBadge");
+  rb.className = `risk-badge ${data.risk_level}`;
+  rb.textContent = `${data.risk_level} Risk`;
+
+  const pct = Math.round((data.risk_score || 0) * 100);
+  document.getElementById("riskScoreVal").textContent = `${pct}%`;
+  const fill = document.getElementById("riskFill");
+  const color = { Low: "#00d4aa", Medium: "#ffab00", High: "#ff4757" }[data.risk_level] || "#3b8bff";
+  fill.style.background = color;
+  setTimeout(() => fill.style.width = pct + "%", 50);
+
+  // Probabilities
+  const probList = document.getElementById("probList");
+  probList.innerHTML = "";
+  (data.top_5_probabilities || []).forEach((item, i) => {
+    const row = document.createElement("div");
+    row.className = "prob-row";
+    row.innerHTML = `
+      <div class="prob-name">${item.disease}</div>
+      <div class="prob-bar-wrap"><div class="prob-bar" style="width:0;${i===0?'background:var(--accent-2)':''}"></div></div>
+      <div class="prob-val">${item.probability.toFixed(1)}%</div>
+    `;
+    probList.appendChild(row);
+    setTimeout(() => row.querySelector(".prob-bar").style.width = item.probability + "%", 100 + i * 60);
+  });
+
+  // Model agreement
+  const modelAg = document.getElementById("modelAgreement");
+  modelAg.innerHTML = "";
+  for (const [name, pred] of Object.entries(data.individual_models || {})) {
+    const match = pred === data.predicted_disease;
+    const chip = document.createElement("div");
+    chip.className = "model-chip";
+    chip.innerHTML = `
+      <div class="model-chip-name">${name.replace(" ", "\n")}</div>
+      <div class="model-chip-val" style="font-size:12px;color:${match?"var(--accent-2)":"var(--accent-3)"};">
+        ${pred}
+      </div>
+    `;
+    modelAg.appendChild(chip);
+  }
+
+  // Recommendations
+  const recList = document.getElementById("recList");
+  recList.innerHTML = "";
+  (data.recommendations || []).forEach(rec => {
+    recList.innerHTML += `<li class="rec-item"><div class="rec-dot"></div>${rec}</li>`;
+  });
+
+  // Disclaimer
+  document.getElementById("disclaimerText").textContent =
+    data.disclaimer || "This is NOT a medical diagnosis. Always consult a qualified healthcare professional.";
+
+  panel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ── CSV Upload ────────────────────────────────────────────────────────────────
+async function uploadCSV(input) {
+  if (!input.files[0]) return;
+  const form = new FormData();
+  form.append("file", input.files[0]);
+
+  try {
+    const resp = await fetch(`${API_BASE}/upload-csv`, { method: "POST", body: form });
+    if (!resp.ok) throw new Error();
+    const stats = await resp.json();
+    renderCSVChart(stats);
+  } catch {
+    // Demo: generate fake trend
+    const n = 50;
+    const hrTrend   = Array.from({length:n}, (_,i) => 70 + 10*Math.sin(i/5) + (Math.random()-0.5)*8);
+    const tempTrend = Array.from({length:n}, (_,i) => 37 + 0.5*Math.sin(i/8) + (Math.random()-0.5)*0.3);
+    renderCSVChart({ hr_trend: hrTrend, temp_trend: tempTrend });
+  }
+}
+
+function renderCSVChart(stats) {
+  document.getElementById("csvChartCard").style.display = "block";
+  const hrData   = stats.hr_trend || stats.hr_trend || [];
+  const tempData = stats.temp_trend || [];
+  const labels   = hrData.map((_, i) => `T-${hrData.length - i}`).reverse();
+
+  if (trendChart) trendChart.destroy();
+  const ctx = document.getElementById("chartCanvas").getContext("2d");
+  trendChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Heart Rate (bpm)", data: hrData, borderColor: "#3b8bff", tension: 0.4, pointRadius: 0, borderWidth: 2, yAxisID: "hr" },
+        { label: "Temperature (°C)", data: tempData, borderColor: "#00d4aa", tension: 0.4, pointRadius: 0, borderWidth: 2, yAxisID: "temp" },
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 600 },
+      plugins: { legend: { labels: { color: "#8fa3c8", font: { size: 12 } } } },
+      scales: {
+        hr:   { type: "linear", position: "left",  ticks: { color: "#3b8bff" }, grid: { color: "rgba(99,178,255,0.08)" } },
+        temp: { type: "linear", position: "right", ticks: { color: "#00d4aa" }, grid: { display: false } },
+        x:    { ticks: { color: "#4a5e80", maxTicksLimit: 10 }, grid: { color: "rgba(255,255,255,0.04)" } },
+      }
+    }
+  });
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+window.addEventListener("load", () => {
+  loadSymptoms();
+  initWaveform();
+  updateIoT();
+  setInterval(updateIoT, 3000);
+  loadModelInfo();
+
+  document.getElementById("sensorMode").addEventListener("change", updateIoT);
+  window.addEventListener("resize", () => {
+    const canvas = document.getElementById("waveform");
+    canvas.width = canvas.parentElement.clientWidth - 24;
+    initWaveform();
+  });
+});
+</script>
+</body>
+</html>
